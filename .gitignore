@@ -1,0 +1,38 @@
+# Secrets / local env
+.env
+.env.local
+.env.development
+.env.*.local
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+.local/
+
+# Local notes
+my_commands.txt
+command_history.txt
+
+# Planning / scratch (not for version control)
+zplan/
+plans/
+*.plan
+
+# Coverage / profiling
+.coverage
+htmlcov/
+*.prof

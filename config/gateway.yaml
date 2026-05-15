@@ -1,0 +1,89 @@
+# Gateway behavioral configuration (hot-reloadable).
+# Secrets stay in environment variables / Secret Manager — never in this file.
+
+gateway:
+  default_timeout_seconds: 60
+  hot_reload: true
+  hot_reload_interval_seconds: 2
+
+logging:
+  level: INFO
+  json: true
+
+telemetry:
+  enabled: true
+  service_name: ai-gateway
+  # null = console exporter for local development
+  otlp_endpoint: null
+
+providers:
+  openai:
+    enabled: true
+    timeout_seconds: 60
+  anthropic:
+    enabled: false
+    timeout_seconds: 60
+    default_base_url: https://api.anthropic.com
+  ollama:
+    enabled: false
+    timeout_seconds: 120
+    default_base_url: http://localhost:11434
+  mock:
+    enabled: true
+    timeout_seconds: 5
+    simulated_latency_ms: 5
+    chaos_fail_rate: 0.0
+    chaos_always_fail: false
+
+routing:
+  heuristics:
+    - prefix: "gpt"
+      provider: openai
+    - prefix: "o1"
+      provider: openai
+    - prefix: "claude"
+      provider: anthropic
+    - prefix: "llama"
+      provider: ollama
+    - prefix: "mistral"
+      provider: ollama
+    - prefix: "mock"
+      provider: mock
+  fallback_chains:
+    - prefixes: ["gpt", "o1"]
+      providers: [openai, mock]
+      fallback_model: mock-chat
+    - prefixes: ["mock"]
+      providers: [mock, openai]
+      fallback_model: mock-chat
+
+rate_limit:
+  default_requests_per_minute: 60
+  default_tokens_per_minute: 100000
+  default_burst_multiplier: 2.0
+  default_priority: normal
+
+budget:
+  default_daily_budget_usd: 100.0
+  default_monthly_budget_usd: 1000.0
+  default_warning_threshold_pct: 80
+  default_hard_enforcement: true
+
+alerting:
+  enabled: false
+  budget_warnings: true
+  circuit_open_alerts: true
+  error_rate_threshold: 0.5
+
+resilience:
+  request_timeout_seconds: 60
+  max_retries: 2
+  retry_base_delay_ms: 50
+  retry_max_delay_ms: 2000
+  retry_budget: 3
+  health_probe_interval_seconds: 30
+  circuit_breaker:
+    failure_threshold: 5
+    recovery_timeout_seconds: 30
+    half_open_max_calls: 2
+    rolling_window_seconds: 60

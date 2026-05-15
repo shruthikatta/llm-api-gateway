@@ -1,0 +1,58 @@
+# Production gateway configuration template
+
+gateway:
+  default_timeout_seconds: 60
+  hot_reload: true
+  hot_reload_interval_seconds: 5
+
+logging:
+  level: INFO
+  json: true
+
+telemetry:
+  enabled: true
+  service_name: ai-gateway
+  otlp_endpoint: https://cloudtrace.googleapis.com/v1/traces
+
+providers:
+  openai:
+    enabled: true
+    timeout_seconds: 60
+  anthropic:
+    enabled: true
+    timeout_seconds: 60
+  mock:
+    enabled: false
+
+routing:
+  heuristics:
+    - prefix: "gpt"
+      provider: openai
+    - prefix: "claude"
+      provider: anthropic
+  fallback_chains:
+    - prefixes: ["gpt", "o1"]
+      providers: [openai, anthropic]
+
+rate_limit:
+  default_requests_per_minute: 120
+  default_tokens_per_minute: 200000
+
+budget:
+  default_daily_budget_usd: 50.0
+  default_monthly_budget_usd: 500.0
+  default_hard_enforcement: true
+
+alerting:
+  enabled: true
+  budget_warnings: true
+  circuit_open_alerts: true
+  error_rate_threshold: 0.3
+
+resilience:
+  request_timeout_seconds: 60
+  max_retries: 2
+  health_probe_interval_seconds: 30
+  circuit_breaker:
+    failure_threshold: 5
+    recovery_timeout_seconds: 60

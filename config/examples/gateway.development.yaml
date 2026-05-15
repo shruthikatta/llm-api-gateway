@@ -1,0 +1,52 @@
+# Development gateway configuration (mock-first, verbose logging)
+
+gateway:
+  default_timeout_seconds: 60
+  hot_reload: true
+  hot_reload_interval_seconds: 2
+
+logging:
+  level: DEBUG
+  json: false
+
+telemetry:
+  enabled: true
+  service_name: ai-gateway-dev
+  otlp_endpoint: null
+
+providers:
+  openai:
+    enabled: false
+  anthropic:
+    enabled: false
+  ollama:
+    enabled: false
+  mock:
+    enabled: true
+    timeout_seconds: 5
+    simulated_latency_ms: 5
+    chaos_fail_rate: 0.0
+
+routing:
+  heuristics:
+    - prefix: "mock"
+      provider: mock
+  fallback_chains:
+    - prefixes: ["mock"]
+      providers: [mock]
+
+rate_limit:
+  default_requests_per_minute: 300
+  default_tokens_per_minute: 500000
+
+budget:
+  default_daily_budget_usd: 100.0
+  default_monthly_budget_usd: 1000.0
+
+alerting:
+  enabled: false
+
+resilience:
+  request_timeout_seconds: 30
+  max_retries: 1
+  health_probe_interval_seconds: 15
