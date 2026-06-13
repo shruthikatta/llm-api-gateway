@@ -1,0 +1,40 @@
+# Example Prometheus alert rules for LLM API Gateway
+
+groups:
+  - name: ai-gateway
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(gateway_requests_total{status!~"2.."}[5m]))
+          / sum(rate(gateway_requests_total[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Gateway error rate above 5%
+
+      - alert: CircuitBreakerOpen
+        expr: max(gateway_circuit_breaker_state) by (provider) >= 2
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Circuit breaker open for provider {{ $labels.provider }}"
+
+      - alert: HighLatencyP95
+        expr: |
+          histogram_quantile(0.95, sum(rate(gateway_request_latency_seconds_bucket[5m])) by (le))
+          > 5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Gateway p95 latency above 5 seconds
+
+      - alert: FailoverSpike
+        expr: sum(rate(gateway_failover_total[5m])) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Elevated provider failover rate

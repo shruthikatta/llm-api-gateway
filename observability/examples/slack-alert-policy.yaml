@@ -1,0 +1,21 @@
+# Example alerting policy (maps to gateway.yaml alerting section + Slack)
+
+alerting:
+  enabled: true
+  budget_warnings: true
+  circuit_open_alerts: true
+  error_rate_threshold: 0.5
+
+# Environment (not in YAML — use Secret Manager in production):
+# SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+
+notifications:
+  budget_warning:
+    channels: [slack]
+    throttle_minutes: 60
+  circuit_open:
+    channels: [slack]
+    throttle_minutes: 15
+  high_error_rate:
+    channels: [slack]
+    threshold: 0.5

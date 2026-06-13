@@ -1,0 +1,79 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "graphTooltip": 0,
+  "panels": [
+    {
+      "datasource": {"type": "prometheus", "uid": "Prometheus"},
+      "fieldConfig": {"defaults": {"unit": "reqps"}},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "id": 1,
+      "targets": [
+        {
+          "expr": "sum(rate(gateway_requests_total[5m]))",
+          "legendFormat": "requests/s"
+        }
+      ],
+      "title": "Request Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "Prometheus"},
+      "fieldConfig": {"defaults": {"unit": "s"}},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "id": 2,
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(gateway_request_latency_seconds_bucket[5m])) by (le, provider))",
+          "legendFormat": "{{provider}} p95"
+        }
+      ],
+      "title": "Latency p95 by Provider",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "Prometheus"},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 8},
+      "id": 3,
+      "targets": [
+        {
+          "expr": "sum(rate(gateway_cost_usd_total[1h]))",
+          "legendFormat": "USD/hour"
+        }
+      ],
+      "title": "Cost Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "Prometheus"},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 8},
+      "id": 4,
+      "targets": [
+        {
+          "expr": "sum(rate(gateway_failover_total[5m])) by (from_provider, to_provider)",
+          "legendFormat": "{{from_provider}} -> {{to_provider}}"
+        }
+      ],
+      "title": "Failover Events",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "Prometheus"},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 8},
+      "id": 5,
+      "targets": [
+        {
+          "expr": "max(gateway_circuit_breaker_state) by (provider)",
+          "legendFormat": "{{provider}}"
+        }
+      ],
+      "title": "Circuit Breaker State",
+      "type": "timeseries"
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["ai-gateway", "phase5"],
+  "title": "LLM API Gateway Operations",
+  "uid": "ai-gateway-ops",
+  "version": 1
+}
